@@ -19,5 +19,6 @@ class Observable(ABC):
 
     def notify(self, event: Any):
         for e, callbacks in self.observers.items():
-            for cb in callbacks:
-                cb()
+            if event == e:
+                for cb in callbacks:
+                    cb()
