@@ -87,7 +87,8 @@ class Gamepad:
 
 
 class Object:
-    color = (255, 0, 0)
+    _color = (255, 0, 0)
+    _image: pygame.Surface = None
 
     def __init__(self, size: Size, position: Point):
         self.size = size
@@ -96,12 +97,20 @@ class Object:
     def place(self, position: Point):
         self.position = position
 
+    def load_image(self, imgsrc: str):
+        self._image = pygame.transform.scale(
+            pygame.image.load(imgsrc), (self.size.width, self.size.height)
+        )
+
+    def fill(self, rgb: list[int, int, int]):
+        self._color = rgb
+
 
 class Engine:
     done: bool
     objects: list[Object] = []
-    _pygame_rects: dict[Object, pygame.Rect] = {}
     gamepads: dict[int, Gamepad] = {}
+    _pygame_rects: dict[Object, pygame.Rect] = {}
     _pygame_joysticks: dict[int, pygame.joystick.Joystick] = {}
 
     def __init__(self, size: Size, title: str):
@@ -180,9 +189,9 @@ class Engine:
         self._draw_object(obj)
 
     def _draw_object(self, obj: Object):
-        self._pygame_rects[obj] = pygame.draw.rect(
+        rect = pygame.draw.rect(
             self.screen._pygame_surface,
-            obj.color,
+            obj._color,
             (
                 obj.position.x - obj.size.width / 2,
                 obj.position.y - obj.size.height / 2,
@@ -190,3 +199,6 @@ class Engine:
                 obj.size.height,
             ),
         )
+        if obj._image:
+            self.screen._pygame_surface.blit(obj._image, rect.topleft)
+        self._pygame_rects[obj] = rect

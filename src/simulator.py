@@ -5,9 +5,9 @@ class Quadcopter(Object):
     def __init__(self, start_point: Point):
         super().__init__(Size(50, 50), start_point)
 
-    def fly(self, x_acceleration: float, y_acceleration: float):
-        self.position.x += x_acceleration
-        self.position.y += y_acceleration
+    def fly(self, delta_x: float, delta_y: float):
+        self.position.x += delta_x
+        self.position.y += delta_y
 
 
 class Simulator:
@@ -19,9 +19,14 @@ class Simulator:
 
     def simulate(self):
         self.gamepad = self.engine.gamepads[0]
-        self.copter = Quadcopter(
-            Point(self.engine.screen.size.width / 2, self.engine.screen.size.height / 2)
-        )
+        center = self.engine.screen.size.width / 2, self.engine.screen.size.height / 2
+
+        self.mark = Object(Size(50, 50), Point(center[0], center[1]))
+        self.mark.load_image("./src/images/cross.svg")
+        self.mark.fill((255, 255, 255))
+        self.engine.add_object(self.mark)
+
+        self.copter = Quadcopter(Point(center[0], center[1]))
         self.engine.add_object(self.copter)
 
         self.gamepad.right_joystick.attach(
@@ -30,9 +35,9 @@ class Simulator:
         self.gamepad.cross_btn.attach(self.on_cross_btn_pressed, Button.Event.PRESS)
 
     def on_trigger_right_joystick(self):
-        x_acceleration = self.gamepad.right_joystick.horizontal_axis
-        y_acceleration = self.gamepad.right_joystick.vertical_axis
-        self.copter.fly(x_acceleration, y_acceleration)
+        delta_x = self.gamepad.right_joystick.horizontal_axis
+        delta_y = self.gamepad.right_joystick.vertical_axis
+        self.copter.fly(delta_x, delta_y)
 
     def on_cross_btn_pressed(self):
         x = self.engine.screen.size.width / 2
