@@ -137,10 +137,12 @@ class Engine:
                         print(f"Gamepad {joystick_id} disconnected.")
 
                 elif event.type == pygame.JOYBUTTONDOWN:
-                    self.gamepads[event.joy].cross_btn.press()
+                    if event.button == 0:
+                        self.gamepads[event.joy].cross_btn.press()
 
                 elif event.type == pygame.JOYBUTTONDOWN:
-                    self.gamepads[event.joy].cross_btn.release()
+                    if event.button == 0:
+                        self.gamepads[event.joy].cross_btn.release()
 
             self.screen.fill((255, 255, 255))
 
