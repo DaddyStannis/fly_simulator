@@ -18,6 +18,7 @@ class Observable(ABC):
             self.observers[event].remove(cb)
 
     def notify(self, event: Any):
-        callbacks = self.observers[event]
-        for cb in callbacks:
-            cb()
+        if event in self.observers:
+            callbacks = self.observers[event]
+            for cb in callbacks:
+                cb()

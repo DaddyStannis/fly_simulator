@@ -49,11 +49,41 @@ class Joystick(Observable):
         self.notify(self.Event.TRIGGER)
 
 
+class Button(Observable):
+    _pressed: bool = False
+
+    def __init__(self, key: str):
+        self.key = key
+
+    class Event(Enum):
+        PRESS = "PRESS"
+        RELEASE = "RELEASE"
+
+    def press(self):
+        self._pressed = True
+        self.notify(self.Event.PRESS)
+
+    def release(self):
+        self._pressed = False
+        self.notify(self.Event.RELEASE)
+
+    @property
+    def pressed(self):
+        return self._pressed
+
+
 class Gamepad:
-    def __init__(self, id: int, left_joystick: Joystick, right_joystick: Joystick):
+    def __init__(
+        self,
+        id: int,
+        left_joystick: Joystick,
+        right_joystick: Joystick,
+        cross_btn: Button,
+    ):
         self.id = id
         self.left_joystick = left_joystick
         self.right_joystick = right_joystick
+        self.cross_btn = cross_btn
 
 
 class Object:
@@ -61,6 +91,9 @@ class Object:
 
     def __init__(self, size: Size, position: Point):
         self.size = size
+        self.position = position
+
+    def place(self, position: Point):
         self.position = position
 
 
@@ -99,10 +132,15 @@ class Engine:
 
                 elif event.type == pygame.JOYDEVICEREMOVED:
                     joystick_id = event.instance_id
-                    print(event.__dict__)
                     if joystick_id in self._pygame_joysticks:
                         del self._pygame_joysticks[joystick_id]
                         print(f"Gamepad {joystick_id} disconnected.")
+
+                elif event.type == pygame.JOYBUTTONDOWN:
+                    self.gamepads[event.joy].cross_btn.press()
+
+                elif event.type == pygame.JOYBUTTONDOWN:
+                    self.gamepads[event.joy].cross_btn.release()
 
             self.screen.fill((255, 255, 255))
 
@@ -130,7 +168,9 @@ class Engine:
             joystick.init()
             id = joystick.get_id()
             inst_id = joystick.get_instance_id()
-            self.gamepads[id] = Gamepad(id, Joystick(0, 0), Joystick(0, 0))
+            self.gamepads[id] = Gamepad(
+                id, Joystick(0, 0), Joystick(0, 0), Button("cross")
+            )
             self._pygame_joysticks[inst_id] = joystick
 
     def add_object(self, obj: Object):
