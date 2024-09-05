@@ -5,9 +5,9 @@ class Hero(Object):
     def __init__(self, start_point: Point):
         super().__init__(Size(50, 50), start_point)
 
-    def move(self, horizontal_axis: float, vertical_axis: float):
-        self.position.x += horizontal_axis
-        self.position.y += vertical_axis
+    def move(self, x_acceleration: float, y_acceleration: float):
+        self.position.x += x_acceleration
+        self.position.y += y_acceleration
 
 
 class Simulator:
