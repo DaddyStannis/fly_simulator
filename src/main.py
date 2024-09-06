@@ -1,4 +1,4 @@
-from simulator import Simulator, Object, Size, Point, Joystick
+from simulator import Simulator, Size
 from engine import Engine
 
 

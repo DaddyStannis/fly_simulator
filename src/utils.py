@@ -6,7 +6,8 @@ Callback = Callable[[], None]
 
 
 class Observable(ABC):
-    observers: dict[Any, list[Callback]] = {}
+    def __init__(self):
+        self.observers: dict[Any, list[Callback]] = {}
 
     def attach(self, cb: Callback, event: Any):
         if event not in self.observers:
