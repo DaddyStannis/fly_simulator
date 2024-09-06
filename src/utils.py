@@ -1,3 +1,4 @@
+import time
 from typing import Callable, Any
 from abc import ABC
 
@@ -23,3 +24,10 @@ class Observable(ABC):
             callbacks = self.observers[event]
             for cb in callbacks:
                 cb()
+
+
+def call_until(interval_secs: int, duration_secs: int, cb: Callback):
+    start_timestamp = time.time()
+    while start_timestamp + duration_secs >= time.time():
+        time.sleep(interval_secs)
+        cb()
