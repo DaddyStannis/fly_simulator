@@ -12,22 +12,26 @@ class Bird(Figure):
         self.position.y += delta_y
 
 
-class Counter:
-    def __init__(self, engine: Engine, labels: list[str], point: Point):
+class Counter(Text):
+    def __init__(self, engine: Engine, labels: list[str], *args, **kwargs):
+        super().__init__(labels[0], *args, **kwargs)
         self.engine = engine
         self.labels = labels
         self.count = 1
-        self.start = time.time()
-        self.counter = Text(labels[0], point, fontsize=120)
-        self.engine.render(self.counter)
-        self.engine.add_task(self.countdown)
+        self.start_time = time.time()
 
-    def countdown(self):
-        if time.time() >= self.start + self.count:
+    def start(self):
+        self.count = 1
+        self.start_time = time.time()
+        self.engine.render(self)
+        self.engine.add_task(self._tick)
+
+    def _tick(self):
+        if time.time() >= self.start_time + self.count:
             if self.count == len(self.labels):
-                self.engine.erase(self.counter)
+                self.engine.erase(self)
             else:
-                self.counter.write(self.labels[self.count])
+                self.write(self.labels[self.count])
                 self.count += 1
 
 
@@ -62,6 +66,12 @@ class Simulator:
         self.gamepad.cross_btn.attach(self.on_cross_btn_pressed, Button.Event.PRESS)
         self.gamepad.r1_btn.attach(self.on_r1_btn_pressed, Button.Event.PRESS)
 
+        # def pause_and_self_destruct():
+        #     self.engine.pause()
+        #     self.engine.rm_task(pause_and_self_destruct)
+
+        # self.engine.add_task(pause_and_self_destruct)
+
     def on_trigger_right_joystick(self):
         delta_x = self.gamepad.right_joystick.horizontal_axis
         delta_y = self.gamepad.right_joystick.vertical_axis
@@ -75,4 +85,5 @@ class Simulator:
     def on_r1_btn_pressed(self):
         labels = ("3", "2", "1", "GO")
         center_point = Point(self.center[0], self.center[1])
-        Counter(self.engine, labels, center_point)
+        countdown = Counter(self.engine, labels, center_point, fontsize=120)
+        countdown.start()

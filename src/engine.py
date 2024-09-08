@@ -178,6 +178,10 @@ class Engine:
     def add_task(self, task: Callback):
         self._tasks.append(task)
 
+    def rm_task(self, task: Callback):
+        if task in self._tasks:
+            self._tasks.remove(task)
+
     def _tick(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
