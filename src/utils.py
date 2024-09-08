@@ -1,4 +1,5 @@
 import time
+import math
 from typing import Callable, Any
 from abc import ABC
 
@@ -31,3 +32,7 @@ def call_until(interval_secs: int, duration_secs: int, cb: Callback):
     while start_timestamp + duration_secs >= time.time():
         time.sleep(interval_secs)
         cb()
+
+
+def segment_length(x1, y1, x2, y2):
+    return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
